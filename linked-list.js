@@ -85,6 +85,10 @@ class LinkedList {
     if (this.head.next){
       removedItem = this.head.val;
       this.head = this.head.next;
+    } else {
+      removedItem = this.head.val;
+      this.head = null;
+      this.tail = null;
     }
 
     this.length--;
@@ -121,17 +125,31 @@ class LinkedList {
   /** insertAt(idx, val): add node w/val before idx. */
 
   insertAt(idx, val) {
-    if (idx < 1){
+    if (idx < 0){
       return 'invalid index'
     }
-    let newNode = new Node(val)
+    let newNode = new Node(val);
+    if (idx === 0 && this.length === 0){
+      this.head = newNode;
+      this.tail = newNode;
+    }
     if (idx === 1){
       newNode.next = this.head;
       this.head =  newNode;
+      if (this.length === 0) {
+        this.head = newNode;
+        this.tail = newNode;
+      }
+      this.length ++;
       return;
     }
 
+    if (idx === this.length) {
+      this.tail = newNode;
+    }
+
     let current = this.head;
+    let i = 0;
     while (i < idx-1 && current) {
       current = current.next;
       i++;
@@ -141,26 +159,43 @@ class LinkedList {
       newNode.next = current.next;
       current.next = newNode
     }
+   
+    this.length ++;
+
   }
 
   /** removeAt(idx): return & remove item at idx, */
 
   removeAt(idx) {
 
-    let removedIdx;
-    if (idx === 0){
-      removedIdx = this.head.val;
+    let removedItem;
+    if (this.length === 0){
+      return null;
+    }
+
+    if(this.length === 1){
+      removedItem = this.head;
+      this.head = null;
+      this.tail = null;
+      this.length --;
+      return removedItem;
+    }
+
+    if (idx === 0 & this.length >= 1){
+      removedItem = this.head;
       this.head = this.head.next;
-      return removedIdx;
+      this.length--;
+      return removedItem;
     }
 
     removedIdx = this.getAt(idx-1)
     if (!removedIdx || !removedIdx.next){
+      this.length--;
       return
     }
     removedIdx.next = removedIdx.next.next;
 
-    
+
   }
 
   /** average(): return an average of all values in the list */
@@ -169,7 +204,11 @@ class LinkedList {
     let sum = 0;
     let counter = 0;
     let currentNode = this.head;
-    while (currentNode.next) {
+    if (this.length === 0){
+      return 0;
+    }
+
+    while (currentNode) {
       sum += currentNode.val;
       currentNode = currentNode.next;
       counter ++;
